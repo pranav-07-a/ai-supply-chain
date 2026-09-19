@@ -2477,6 +2477,15 @@ const riskSummary = {
 const categories: Category[] = ["All", "Fashion", "Girls Fashion", "Electronics", "Mobiles", "Laptops", "Audio", "Gaming", "Accessories"];
 
 const amazonPools: Record<Exclude<Category,"All">, string[]> = {
+  "Fashion": [
+    "https://m.media-amazon.com/images/I/71c8B2k8JYL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71zM7WmYHXL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/61f5eX3tQGL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71nM5K2J7TL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71pYQ7XxSLL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71pg5pOHQPL._AC_UL320_.jpg",
+    "https://m.media-amazon.com/images/I/51YdVjb50BL._AC_UY1000_.jpg",
+  ],
   "Girls Fashion": [
     "https://m.media-amazon.com/images/I/61YkV5V4Z-L._AC_UY1000_.jpg",
     "https://m.media-amazon.com/images/I/71c8B2k8JYL._AC_UY1000_.jpg",

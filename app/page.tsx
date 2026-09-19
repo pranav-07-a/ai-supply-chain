@@ -2477,6 +2477,15 @@ const riskSummary = {
 const categories: Category[] = ["All", "Fashion", "Girls Fashion", "Electronics", "Mobiles", "Laptops", "Audio", "Gaming", "Accessories"];
 
 const amazonPools: Record<Exclude<Category,"All">, string[]> = {
+  "Fashion": [
+    "https://m.media-amazon.com/images/I/71c8B2k8JYL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71zM7WmYHXL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/61f5eX3tQGL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71nM5K2J7TL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71pYQ7XxSLL._AC_UY1000_.jpg",
+    "https://m.media-amazon.com/images/I/71pg5pOHQPL._AC_UL320_.jpg",
+    "https://m.media-amazon.com/images/I/51YdVjb50BL._AC_UY1000_.jpg",
+  ],
   "Girls Fashion": [
     "https://m.media-amazon.com/images/I/61YkV5V4Z-L._AC_UY1000_.jpg",
     "https://m.media-amazon.com/images/I/71c8B2k8JYL._AC_UY1000_.jpg",
@@ -5712,6 +5721,16 @@ function AIRiskCatalogue({ onOpenScenario }: { onOpenScenario: () => void }) {
   } | null>(null);
   const [mlLoading, setMlLoading] = useState(false);
   const [mlError, setMlError] = useState<string | null>(null);
+  const [supplierReliability, setSupplierReliability] = useState(61);
+const [leadTime, setLeadTime] = useState(14);
+const [inventoryDays, setInventoryDays] = useState(7);
+const [demandGrowth, setDemandGrowth] = useState(28);
+const [transportDelay, setTransportDelay] = useState(5);
+const [forecastError, setForecastError] = useState(11);
+const [qualityScore, setQualityScore] = useState(78);
+const [externalRisk, setExternalRisk] = useState(70);
+const [singleSourceDependency, setSingleSourceDependency] = useState(1);
+
   const pageSize = 8;
 
   const filtered = useMemo(() => {
@@ -5743,44 +5762,56 @@ function AIRiskCatalogue({ onOpenScenario }: { onOpenScenario: () => void }) {
     document.getElementById("risk-detail")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  async function runAiRiskAnalysis() {
-    setMlLoading(true);
-    setMlError(null);
+ async function runAiRiskAnalysis() {
+  setMlLoading(true);
+  setMlError(null);
 
-    try {
-      const response = await fetch("http://127.0.0.1:8000/predict", {
+  try {
+    const response = await fetch(
+      "/api/predict",
+      {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          supplier_reliability: 61,
-          lead_time: 14,
-          inventory_days: 7,
-          demand_growth: 28,
-          transport_delay: 5,
-          forecast_error: 11,
-          quality_score: 78,
-          external_risk: 70,
-          single_source_dependency: 1,
+          supplier_reliability: supplierReliability,
+          lead_time: leadTime,
+          inventory_days: inventoryDays,
+          demand_growth: demandGrowth,
+          transport_delay: transportDelay,
+          forecast_error: forecastError,
+          quality_score: qualityScore,
+          external_risk: externalRisk,
+          single_source_dependency: singleSourceDependency,
         }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Risk prediction failed");
       }
+    );
 
-      setMlResult({
-        risk_score: Number(data.risk_score),
-        risk_level: String(data.risk_level),
-      });
-    } catch (error) {
-      setMlError(error instanceof Error ? error.message : "Unable to connect to AI risk service");
-    } finally {
-      setMlLoading(false);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || "Risk prediction failed"
+      );
     }
-  }
 
+    setMlResult(data);
+
+  } catch (error) {
+
+    setMlError(
+      error instanceof Error
+        ? error.message
+        : "Unable to connect to AI risk service"
+    );
+
+  } finally {
+
+    setMlLoading(false);
+
+  }
+}
   function reset() {
     setDomain("All");
     setLevel("All");
@@ -5859,6 +5890,245 @@ function AIRiskCatalogue({ onOpenScenario }: { onOpenScenario: () => void }) {
           <div className="flex items-center gap-2 text-cyan-200">
             <Brain className="h-4 w-4" />
             <h4 className="text-sm font-black">Live ML Risk Prediction</h4>
+            <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-900 p-5">
+
+  <div className="flex items-center gap-2 text-cyan-200">
+    <SlidersHorizontal className="h-4 w-4" />
+
+    <h4 className="text-sm font-black">
+      Supply-Chain ML Inputs
+    </h4>
+  </div>
+
+  <p className="mt-2 text-xs leading-5 text-slate-400">
+    Adjust supply-chain conditions and send them to the
+    Random Forest prediction model.
+  </p>
+
+  <div className="mt-5 space-y-5">
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Supplier Reliability
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {supplierReliability}%
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={supplierReliability}
+        onChange={(e) =>
+          setSupplierReliability(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Lead Time
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {leadTime} days
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="1"
+        max="30"
+        value={leadTime}
+        onChange={(e) =>
+          setLeadTime(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Inventory Coverage
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {inventoryDays} days
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="1"
+        max="30"
+        value={inventoryDays}
+        onChange={(e) =>
+          setInventoryDays(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Demand Growth
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {demandGrowth}%
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="-10"
+        max="50"
+        value={demandGrowth}
+        onChange={(e) =>
+          setDemandGrowth(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Transport Delay
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {transportDelay} days
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="15"
+        value={transportDelay}
+        onChange={(e) =>
+          setTransportDelay(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Forecast Error
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {forecastError}%
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="30"
+        value={forecastError}
+        onChange={(e) =>
+          setForecastError(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Quality Score
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {qualityScore}%
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={qualityScore}
+        onChange={(e) =>
+          setQualityScore(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          External Risk
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {externalRisk}%
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={externalRisk}
+        onChange={(e) =>
+          setExternalRisk(Number(e.target.value))
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+
+    <label className="block">
+      <div className="flex justify-between">
+        <span className="text-xs font-bold text-slate-300">
+          Single-Source Dependency
+        </span>
+
+        <span className="text-xs font-black text-cyan-200">
+          {singleSourceDependency === 1
+            ? "Yes"
+            : "No"}
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="1"
+        value={singleSourceDependency}
+        onChange={(e) =>
+          setSingleSourceDependency(
+            Number(e.target.value)
+          )
+        }
+        className="mt-2 w-full accent-cyan-300"
+      />
+    </label>
+
+  </div>
+</div>
           </div>
           <p className="mt-2 text-xs leading-5 text-slate-400">
             Sends supply-chain signals to your trained Random Forest model.
